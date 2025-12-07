@@ -216,5 +216,3 @@ npm test
 | DevOps | Docker, Docker Compose |
 
 ## 📄 License
-
-© 2024
