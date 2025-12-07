@@ -215,4 +215,3 @@ npm test
 | Frontend | React, Vite, Tailwind, Zustand |
 | DevOps | Docker, Docker Compose |
 
-## 📄 License
