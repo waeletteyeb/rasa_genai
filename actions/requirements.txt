@@ -1,0 +1,41 @@
+# ============================================================================
+# Requirements Action Server Python
+# ============================================================================
+
+# Rasa SDK
+rasa-sdk==3.6.2
+
+# OpenAI
+openai>=1.0.0
+
+# Vector Store
+chromadb>=0.4.0
+
+# Utilities
+tenacity>=8.0.0
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+
+# Document Processing
+pypdf>=3.0.0
+python-docx>=0.8.0
+tiktoken>=0.5.0
+
+# MongoDB (for logging/analytics)
+pymongo>=4.0.0
+motor>=3.0.0
+
+# HTTP
+httpx>=0.24.0
+aiohttp>=3.8.0
+
+# Data Processing
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Logging
+structlog>=23.0.0

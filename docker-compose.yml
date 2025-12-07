@@ -1,0 +1,152 @@
+# ============================================================================
+# DOCKER COMPOSE - Orchestration de tous les services
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # RASA SERVER
+  # ============================================================================
+  rasa:
+    build:
+      context: ./rasa
+      dockerfile: Dockerfile
+    container_name: rasa-server
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./rasa:/app
+      - rasa-models:/app/models
+    environment:
+      - RASA_DUCKLING_HTTP_URL=http://duckling:8000
+    depends_on:
+      - action-server
+      - mongodb
+      - redis
+    networks:
+      - chatbot-network
+    command: ["run", "--enable-api", "--cors", "*", "--debug"]
+
+  # ============================================================================
+  # ACTION SERVER (Python + LLM + RAG)
+  # ============================================================================
+  action-server:
+    build:
+      context: ./actions
+      dockerfile: Dockerfile
+    container_name: action-server
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./actions:/app
+      - chroma-data:/app/chroma_db
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MONGODB_URI=mongodb://mongodb:27017/sofrecom_chatbot
+      - CHROMA_PERSIST_DIR=/app/chroma_db
+      - RAG_CONFIDENCE_THRESHOLD=0.75
+      - LOG_LEVEL=INFO
+    depends_on:
+      - mongodb
+    networks:
+      - chatbot-network
+
+  # ============================================================================
+  # BACKEND NODE.JS
+  # ============================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-api
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend-uploads:/app/uploads
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/sofrecom_chatbot
+      - JWT_SECRET=${JWT_SECRET:-sofrecom-secret-change-me}
+      - RASA_URL=http://rasa:5005
+      - ACTION_SERVER_URL=http://action-server:5055
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - mongodb
+      - rasa
+    networks:
+      - chatbot-network
+
+  # ============================================================================
+  # FRONTEND REACT
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-dashboard
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - chatbot-network
+
+  # ============================================================================
+  # MONGODB
+  # ============================================================================
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=sofrecom_chatbot
+    networks:
+      - chatbot-network
+
+  # ============================================================================
+  # REDIS (Lock Store pour Rasa)
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - chatbot-network
+
+  # ============================================================================
+  # DUCKLING (Entity Extraction)
+  # ============================================================================
+  duckling:
+    image: rasa/duckling:latest
+    container_name: duckling
+    ports:
+      - "8000:8000"
+    networks:
+      - chatbot-network
+
+# ============================================================================
+# VOLUMES
+# ============================================================================
+volumes:
+  mongodb-data:
+  redis-data:
+  rasa-models:
+  chroma-data:
+  backend-uploads:
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+networks:
+  chatbot-network:
+    driver: bridge

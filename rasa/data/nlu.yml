@@ -1,0 +1,525 @@
+# ============================================================================
+# RASA NLU TRAINING DATA
+# Exemples d'entraînement pour la classification d'intents
+# ============================================================================
+
+version: "3.1"
+
+nlu:
+
+# ============================================================================
+# INTENTS DE BASE
+# ============================================================================
+
+- intent: greet
+  examples: |
+    - bonjour
+    - salut
+    - hey
+    - coucou
+    - bonsoir
+    - hello
+    - hi
+    - bjr
+    - slt
+    - bonjour à vous
+    - bonjour !
+    - salut !
+    - bonne journée
+    - bonjour, comment allez-vous ?
+    - salut, ça va ?
+    - hello there
+    - hey salut
+    - bonsoir à tous
+    - yo
+    - wesh
+    - coucou c'est moi
+    - bonjour je suis nouveau ici
+    - salut je cherche de l'aide
+    - bonjour j'ai une question
+
+- intent: goodbye
+  examples: |
+    - au revoir
+    - bye
+    - à bientôt
+    - goodbye
+    - à plus
+    - bonne journée
+    - bonne soirée
+    - ciao
+    - salut (pour partir)
+    - je m'en vais
+    - je vous laisse
+    - merci au revoir
+    - c'est tout pour moi
+    - j'ai terminé
+    - bye bye
+    - à la prochaine
+    - on se reparle
+    - bonne continuation
+    - prenez soin de vous
+    - à plus tard
+
+- intent: affirm
+  examples: |
+    - oui
+    - yes
+    - ouais
+    - absolument
+    - bien sûr
+    - tout à fait
+    - exactement
+    - c'est ça
+    - ok
+    - d'accord
+    - parfait
+    - ça marche
+    - affirmatif
+    - yep
+    - oui oui
+    - oui c'est bon
+    - oui merci
+    - oui s'il vous plaît
+    - oui je confirme
+    - correct
+    - c'est correct
+    - ça me va
+    - je suis d'accord
+    - validé
+
+- intent: deny
+  examples: |
+    - non
+    - no
+    - nope
+    - pas du tout
+    - absolument pas
+    - non merci
+    - je refuse
+    - certainement pas
+    - jamais
+    - pas vraiment
+    - non ce n'est pas ça
+    - ce n'est pas ce que je veux
+    - nan
+    - non non
+    - pas question
+    - je ne pense pas
+    - pas exactement
+    - ce n'est pas correct
+    - faux
+    - négatif
+
+- intent: mood_great
+  examples: |
+    - super
+    - génial
+    - fantastique
+    - je vais bien
+    - ça va très bien
+    - excellent
+    - parfait
+    - je suis content
+    - tout va bien
+    - nickel
+    - au top
+    - impeccable
+    - je suis satisfait
+    - très bien merci
+    - ça roule
+    - la forme
+    - très heureux
+    - enchanté
+    - ravi
+    - c'est génial
+
+- intent: mood_unhappy
+  examples: |
+    - je suis triste
+    - pas bien
+    - ça ne va pas
+    - malheureux
+    - déçu
+    - frustré
+    - énervé
+    - pas content
+    - insatisfait
+    - mécontent
+    - je suis déçu
+    - c'est nul
+    - pas terrible
+    - bof
+    - ça pourrait aller mieux
+    - pas génial
+    - je suis en colère
+    - c'est décevant
+    - mauvaise journée
+    - pas top
+
+- intent: bot_challenge
+  examples: |
+    - tu es un robot ?
+    - es-tu un bot ?
+    - suis-je en train de parler à un humain ?
+    - es-tu une vraie personne ?
+    - tu es humain ou machine ?
+    - c'est un chatbot ?
+    - je parle à une IA ?
+    - t'es un robot ou quoi ?
+    - es-tu une intelligence artificielle ?
+    - suis-je en train de parler à une machine ?
+    - qui es-tu ?
+    - qu'est-ce que tu es ?
+    - t'es un vrai être humain ?
+    - tu es automatique ?
+    - c'est du préprogrammé ?
+
+- intent: thank
+  examples: |
+    - merci
+    - merci beaucoup
+    - thanks
+    - thank you
+    - je vous remercie
+    - c'est gentil
+    - très aimable
+    - merci infiniment
+    - grand merci
+    - mille mercis
+    - merci pour votre aide
+    - je suis reconnaissant
+    - c'est très gentil de votre part
+    - merci pour tout
+    - super merci
+    - cool merci
+    - thx
+    - ty
+    - merci bien
+
+# ============================================================================
+# INTENTS MÉTIER
+# ============================================================================
+
+- intent: ask_services
+  examples: |
+    - quels sont vos services ?
+    - que proposez-vous ?
+    - quels services offrez-vous ?
+    - je voudrais connaître vos services
+    - présentez-moi vos offres
+    - qu'est-ce que vous faites ?
+    - quelles sont vos prestations ?
+    - dites-moi ce que vous proposez
+    - je cherche des informations sur vos services
+    - montrez-moi vos solutions
+    - quelles solutions proposez-vous ?
+    - avez-vous des services de [service_type]
+    - je m'intéresse à vos services
+    - parlez-moi de vos offres
+    - c'est quoi votre activité ?
+    - que faites-vous exactement ?
+    - votre catalogue de services
+    - liste des services disponibles
+    - vos domaines d'expertise
+    - dans quoi êtes-vous spécialisés
+    - quelles sont vos compétences
+
+- intent: ask_contact
+  examples: |
+    - comment vous contacter ?
+    - je voudrais vous contacter
+    - donnez-moi vos coordonnées
+    - quel est votre numéro de téléphone ?
+    - quelle est votre adresse email ?
+    - comment puis-je vous joindre ?
+    - vos coordonnées s'il vous plaît
+    - un moyen de vous contacter ?
+    - je cherche à vous contacter
+    - comment joindre le service client ?
+    - numéro du service client
+    - email de contact
+    - je veux parler à quelqu'un
+    - comment avoir un rendez-vous ?
+    - je souhaite prendre contact
+    - coordonnées de l'entreprise
+    - téléphone du siège
+    - adresse mail support
+
+- intent: ask_pricing
+  examples: |
+    - quels sont vos tarifs ?
+    - combien ça coûte ?
+    - quel est le prix ?
+    - donnez-moi un devis
+    - c'est combien ?
+    - tarification s'il vous plaît
+    - prix de vos services
+    - je voudrais un devis
+    - estimez le coût
+    - budget nécessaire
+    - vos prix sont comment ?
+    - c'est cher ?
+    - fourchette de prix
+    - grille tarifaire
+    - coût d'un projet
+    - combien pour [service_type]
+    - prix pour une prestation
+    - estimation de coût
+    - avez-vous des forfaits ?
+    - différents tarifs disponibles
+
+- intent: ask_support
+  examples: |
+    - j'ai besoin d'aide technique
+    - support technique s'il vous plaît
+    - j'ai un problème
+    - ça ne marche pas
+    - je rencontre une erreur
+    - besoin d'assistance
+    - aidez-moi svp
+    - problème technique
+    - bug à signaler
+    - mon service ne fonctionne pas
+    - dysfonctionnement
+    - panne
+    - incident technique
+    - j'ai une question technique
+    - comment résoudre ce problème
+    - le système plante
+    - erreur dans l'application
+    - besoin de dépannage
+    - assistance urgente
+    - support client
+
+- intent: ask_hours
+  examples: |
+    - quels sont vos horaires ?
+    - vous êtes ouverts quand ?
+    - heures d'ouverture
+    - à quelle heure ouvrez-vous ?
+    - vous fermez à quelle heure ?
+    - horaires du service client
+    - êtes-vous ouverts le weekend ?
+    - ouverts le samedi ?
+    - disponibilité
+    - quand puis-je vous appeler ?
+    - horaires de la hotline
+    - 24h/24 ?
+    - support disponible quand ?
+    - jours d'ouverture
+    - vous êtes fermés quand ?
+
+- intent: ask_location
+  examples: |
+    - où êtes-vous situés ?
+    - quelle est votre adresse ?
+    - votre localisation ?
+    - où se trouve votre bureau ?
+    - adresse du siège
+    - je cherche vos locaux
+    - comment venir chez vous ?
+    - où vous trouver ?
+    - plan d'accès
+    - itinéraire pour vous rejoindre
+    - vous êtes où ?
+    - adresse physique
+    - lieu de rendez-vous
+    - parking disponible ?
+    - accès en transport
+
+- intent: ask_faq
+  examples: |
+    - j'ai une question
+    - questions fréquentes
+    - FAQ
+    - aide générale
+    - information générale
+    - renseignement
+    - je voudrais savoir
+    - pouvez-vous m'expliquer
+    - j'aimerais comprendre
+    - c'est quoi exactement
+    - comment ça marche ?
+    - expliquez-moi
+    - besoin d'explications
+    - je ne comprends pas
+    - plus d'infos sur
+
+- intent: ask_product_info
+  examples: |
+    - informations sur le produit [product_name]
+    - parlez-moi de [product_name]
+    - détails sur votre offre
+    - caractéristiques du produit
+    - fiche produit
+    - spécifications techniques
+    - fonctionnalités disponibles
+    - que comprend l'offre ?
+    - description détaillée
+    - en savoir plus sur [product_name]
+    - avantages de votre solution
+    - comparaison des offres
+    - différence entre les produits
+
+- intent: ask_documentation
+  examples: |
+    - avez-vous de la documentation ?
+    - je cherche un guide
+    - documentation technique
+    - manuel d'utilisation
+    - tutoriel disponible ?
+    - guide de démarrage
+    - ressources d'apprentissage
+    - où trouver la doc ?
+    - API documentation
+    - guides et tutoriels
+    - documentation PDF
+    - support écrit
+    - base de connaissances
+    - articles d'aide
+
+- intent: make_complaint
+  examples: |
+    - je veux faire une réclamation
+    - j'ai une plainte
+    - je suis mécontent
+    - service déplorable
+    - je veux me plaindre
+    - réclamation à faire
+    - problème non résolu
+    - mauvaise expérience
+    - insatisfait du service
+    - je veux porter plainte
+    - signaler un problème
+    - incident à reporter
+    - mauvais traitement
+    - ça fait plusieurs fois que...
+    - personne ne m'aide
+
+- intent: request_callback
+  examples: |
+    - je voudrais être rappelé
+    - pouvez-vous me rappeler ?
+    - demande de rappel
+    - rappel téléphonique
+    - appelez-moi s'il vous plaît
+    - je préfère être contacté par téléphone
+    - planifier un appel
+    - réserver un créneau d'appel
+    - on peut m'appeler ?
+    - je souhaite un rappel
+    - contactez-moi par téléphone
+    - prévoir un appel
+    - rdv téléphonique
+
+- intent: ask_human_agent
+  examples: |
+    - je veux parler à un humain
+    - passez-moi un conseiller
+    - agent humain s'il vous plaît
+    - je préfère parler à une vraie personne
+    - transférez-moi
+    - un conseiller svp
+    - je veux un vrai interlocuteur
+    - pas un robot, un humain
+    - opérateur s'il vous plaît
+    - service client humain
+    - parler à quelqu'un de réel
+    - j'ai besoin d'un conseiller
+    - escalader ma demande
+    - ce bot ne m'aide pas
+    - je veux de l'aide humaine
+
+- intent: out_of_scope
+  examples: |
+    - quel temps fait-il ?
+    - raconte-moi une blague
+    - quelle est la capitale de la France ?
+    - parle-moi de politique
+    - qu'est-ce que la vie ?
+    - combien font 2+2 ?
+    - quel âge as-tu ?
+    - quelle est ta couleur préférée ?
+    - joue de la musique
+    - commande-moi une pizza
+    - réserve un vol
+    - fais mes devoirs
+    - traduis ce texte
+    - qu'est-ce que l'amour ?
+    - explique-moi la physique quantique
+    - parle-moi d'autre chose
+    - change de sujet
+
+# ============================================================================
+# SYNONYMES
+# ============================================================================
+
+- synonym: email
+  examples: |
+    - mail
+    - e-mail
+    - courriel
+    - adresse électronique
+
+- synonym: téléphone
+  examples: |
+    - tel
+    - phone
+    - numéro
+    - portable
+    - mobile
+
+- synonym: support
+  examples: |
+    - aide
+    - assistance
+    - dépannage
+    - service technique
+
+# ============================================================================
+# REGEX PATTERNS
+# ============================================================================
+
+- regex: email
+  examples: |
+    - [a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+
+
+- regex: phone_number
+  examples: |
+    - (\+33|0)[1-9](\s?\d{2}){4}
+    - \d{10}
+
+- regex: ticket_number
+  examples: |
+    - TKT-\d{6}
+    - TICKET-\d+
+
+# ============================================================================
+# LOOKUP TABLES
+# ============================================================================
+
+- lookup: service_type
+  examples: |
+    - conseil
+    - développement
+    - cloud
+    - cybersécurité
+    - data
+    - IA
+    - intelligence artificielle
+    - infrastructure
+    - migration
+    - formation
+    - audit
+    - intégration
+
+- lookup: product_name
+  examples: |
+    - starter
+    - business
+    - enterprise
+    - premium
+    - basic
+    - pro
+    - ultimate

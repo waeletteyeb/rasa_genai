@@ -1,0 +1,327 @@
+# ============================================================================
+# RASA DOMAIN CONFIGURATION
+# Définition des intents, entities, slots, actions et responses
+# ============================================================================
+
+version: "3.1"
+
+# ============================================================================
+# INTENTS - Intentions utilisateur détectées par le NLU
+# ============================================================================
+intents:
+  # --- Intents de base ---
+  - greet                    # Salutations
+  - goodbye                  # Au revoir
+  - affirm                   # Confirmation (oui)
+  - deny                     # Négation (non)
+  - mood_great               # Bonne humeur
+  - mood_unhappy             # Mauvaise humeur
+  - bot_challenge            # Test si bot ou humain
+  - thank                    # Remerciements
+  
+  # --- Intents métier (exemples Sofrecom) ---
+  - ask_services             # Demande sur les services
+  - ask_contact              # Demande de contact
+  - ask_pricing              # Questions sur les tarifs
+  - ask_support              # Demande de support technique
+  - ask_hours                # Horaires d'ouverture
+  - ask_location             # Localisation/adresse
+  - ask_faq                  # Questions fréquentes générales
+  - ask_product_info         # Informations produit
+  - ask_documentation        # Demande de documentation
+  - make_complaint           # Faire une réclamation
+  - request_callback         # Demande de rappel
+  - ask_human_agent          # Demande d'agent humain
+  
+  # --- Intent spécial pour RAG ---
+  - out_of_scope             # Questions hors scope (trigger RAG)
+  - nlu_fallback             # Fallback NLU (confiance < seuil)
+
+# ============================================================================
+# ENTITIES - Entités extraites des messages
+# ============================================================================
+entities:
+  - person                   # Nom de personne
+  - organization             # Nom d'organisation
+  - location                 # Lieu
+  - email                    # Adresse email
+  - phone_number             # Numéro de téléphone
+  - product_name             # Nom de produit
+  - service_type             # Type de service
+  - date                     # Date
+  - time                     # Heure
+  - amount                   # Montant
+  - ticket_number            # Numéro de ticket
+
+# ============================================================================
+# SLOTS - Variables de session
+# ============================================================================
+slots:
+  # Informations utilisateur
+  user_name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: person
+        
+  user_email:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: email
+        
+  user_phone:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: phone_number
+        
+  # Contexte de la conversation
+  current_topic:
+    type: categorical
+    values:
+      - services
+      - support
+      - pricing
+      - general
+    influence_conversation: true
+    mappings:
+      - type: custom
+        
+  # Confiance NLU pour le routing
+  nlu_confidence:
+    type: float
+    influence_conversation: false
+    mappings:
+      - type: custom
+        
+  # Réponse RAG stockée
+  rag_response:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+        
+  # Contexte RAG récupéré
+  rag_context:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+        
+  # Feedback utilisateur
+  user_feedback:
+    type: categorical
+    values:
+      - positive
+      - negative
+      - neutral
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  # Ticket support
+  ticket_number:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: ticket_number
+
+# ============================================================================
+# RESPONSES - Réponses du bot (templates)
+# ============================================================================
+responses:
+  # --- Réponses de base ---
+  utter_greet:
+    - text: "Bonjour ! Je suis l'assistant virtuel Sofrecom. Comment puis-je vous aider aujourd'hui ?"
+    - text: "Bienvenue ! Je suis là pour répondre à vos questions. Que puis-je faire pour vous ?"
+    - text: "Salut ! Comment puis-je vous assister ?"
+      
+  utter_goodbye:
+    - text: "Au revoir ! N'hésitez pas à revenir si vous avez d'autres questions."
+    - text: "À bientôt ! Passez une excellente journée."
+    - text: "Merci de votre visite. À la prochaine !"
+      
+  utter_iamabot:
+    - text: "Je suis un assistant virtuel propulsé par l'intelligence artificielle. Je suis là pour vous aider !"
+      
+  utter_happy:
+    - text: "Super ! Je suis ravi de pouvoir vous aider. 😊"
+    - text: "Parfait ! Y a-t-il autre chose que je peux faire pour vous ?"
+      
+  utter_cheer_up:
+    - text: "Je suis désolé d'entendre ça. 😔 Voici quelque chose qui pourrait vous remonter le moral !"
+      image: "https://i.imgur.com/nGF1K8f.jpg"
+    - text: "Je comprends. Comment puis-je améliorer votre journée ?"
+      
+  utter_did_that_help:
+    - text: "Est-ce que ma réponse vous a été utile ?"
+    - text: "Ai-je pu répondre à votre question ?"
+      
+  utter_thank:
+    - text: "Je vous en prie ! C'est un plaisir de vous aider."
+    - text: "De rien ! N'hésitez pas si vous avez d'autres questions."
+      
+  # --- Réponses métier ---
+  utter_services:
+    - text: |
+        Nous proposons une gamme complète de services :
+        
+        📊 **Conseil & Stratégie** - Accompagnement dans votre transformation digitale
+        💻 **Développement** - Solutions sur mesure (web, mobile, API)
+        ☁️ **Cloud & Infrastructure** - Migration et gestion cloud
+        🔒 **Cybersécurité** - Protection de vos données et systèmes
+        📈 **Data & IA** - Exploitation intelligente de vos données
+        
+        Quel service vous intéresse particulièrement ?
+        
+  utter_contact:
+    - text: |
+        Vous pouvez nous contacter de plusieurs façons :
+        
+        📧 **Email** : contact@sofrecom.com
+        📞 **Téléphone** : +33 1 XX XX XX XX
+        🌐 **Site web** : www.sofrecom.com
+        📍 **Adresse** : [Adresse à compléter]
+        
+        Souhaitez-vous qu'un conseiller vous rappelle ?
+        
+  utter_pricing:
+    - text: |
+        Nos tarifs dépendent de plusieurs facteurs :
+        - Type de service requis
+        - Complexité du projet
+        - Durée de l'engagement
+        
+        Je vous invite à contacter notre équipe commerciale pour obtenir un devis personnalisé.
+        Puis-je organiser un rendez-vous ?
+        
+  utter_support:
+    - text: |
+        Pour le support technique :
+        
+        🔧 **Hotline** : +33 1 XX XX XX XX (24/7)
+        📧 **Email support** : support@sofrecom.com
+        💬 **Chat en direct** : Disponible sur notre site
+        
+        Avez-vous un numéro de ticket existant ?
+        
+  utter_hours:
+    - text: |
+        Nos horaires d'ouverture :
+        
+        🕐 **Lundi - Vendredi** : 9h00 - 18h00
+        🕐 **Samedi** : 9h00 - 12h00
+        🚫 **Dimanche** : Fermé
+        
+        Le support technique est disponible 24/7.
+        
+  utter_location:
+    - text: |
+        Notre siège social :
+        
+        📍 **Adresse** : [Adresse complète]
+        🚇 **Métro** : [Station la plus proche]
+        🅿️ **Parking** : Disponible sur place
+        
+        Souhaitez-vous un itinéraire ?
+        
+  utter_ask_human:
+    - text: |
+        Je comprends que vous souhaitez parler à un conseiller.
+        
+        Je peux :
+        1. 📞 Transférer votre demande à un agent
+        2. 📅 Planifier un rappel à l'heure de votre choix
+        
+        Que préférez-vous ?
+        
+  utter_callback_confirm:
+    - text: "Parfait ! Un conseiller vous rappellera dans les plus brefs délais. Puis-je avoir votre numéro de téléphone ?"
+    
+  utter_complaint_received:
+    - text: |
+        Je suis désolé pour ce désagrément. Votre réclamation a été enregistrée.
+        
+        📝 **Numéro de suivi** : [Généré automatiquement]
+        ⏱️ **Délai de traitement** : 48-72h
+        
+        Un membre de notre équipe vous contactera rapidement.
+        
+  # --- Réponses fallback ---
+  utter_default:
+    - text: "Je ne suis pas sûr de comprendre. Pourriez-vous reformuler votre question ?"
+    - text: "Hmm, je n'ai pas bien compris. Pouvez-vous préciser ?"
+    
+  utter_ask_rephrase:
+    - text: "Je n'ai pas bien compris votre demande. Pourriez-vous la reformuler différemment ?"
+    
+  utter_out_of_scope:
+    - text: "Cette question dépasse mon domaine d'expertise actuel. Laissez-moi chercher dans notre base de connaissances..."
+    
+  utter_rag_searching:
+    - text: "Je recherche les informations pertinentes dans notre documentation..."
+    
+  utter_rag_no_answer:
+    - text: |
+        Je n'ai pas trouvé d'information précise sur ce sujet dans notre documentation.
+        
+        Souhaitez-vous :
+        1. Reformuler votre question ?
+        2. Parler à un conseiller humain ?
+
+# ============================================================================
+# ACTIONS - Actions custom (exécutées par l'Action Server)
+# ============================================================================
+actions:
+  # Actions RAG + LLM
+  - action_rag_query              # Requête RAG complète
+  - action_router                 # Router basé sur la confiance
+  - action_check_confidence       # Vérifie le score de confiance NLU
+  
+  # Actions métier
+  - action_create_ticket          # Créer un ticket support
+  - action_get_ticket_status      # Statut d'un ticket
+  - action_request_callback       # Demander un rappel
+  - action_log_conversation       # Logger la conversation
+  - action_get_user_info          # Récupérer infos utilisateur
+  - action_send_feedback          # Envoyer feedback
+  
+  # Actions système
+  - action_session_start          # Initialisation session
+  - action_default_fallback       # Fallback par défaut
+  - action_restart                # Redémarrer conversation
+
+# ============================================================================
+# FORMS - Formulaires de collecte d'informations
+# ============================================================================
+forms:
+  # Formulaire de contact
+  contact_form:
+    required_slots:
+      - user_name
+      - user_email
+      - user_phone
+      
+  # Formulaire de réclamation
+  complaint_form:
+    required_slots:
+      - user_name
+      - user_email
+
+  # Formulaire de callback
+  callback_form:
+    required_slots:
+      - user_name
+      - user_phone
+
+# ============================================================================
+# SESSION CONFIGURATION
+# ============================================================================
+session_config:
+  session_expiration_time: 60    # Minutes avant expiration
+  carry_over_slots_to_new_session: true

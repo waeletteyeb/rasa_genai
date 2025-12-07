@@ -1,0 +1,205 @@
+# ============================================================================
+# RASA RULES - Règles de dialogue déterministes
+# ============================================================================
+
+version: "3.1"
+
+rules:
+
+# ============================================================================
+# RÈGLES DE BASE - Réponses automatiques
+# ============================================================================
+
+- rule: Répondre aux salutations
+  steps:
+    - intent: greet
+    - action: utter_greet
+
+- rule: Répondre aux au revoir
+  steps:
+    - intent: goodbye
+    - action: utter_goodbye
+
+- rule: Répondre au bot challenge
+  steps:
+    - intent: bot_challenge
+    - action: utter_iamabot
+
+- rule: Répondre aux remerciements
+  steps:
+    - intent: thank
+    - action: utter_thank
+
+# ============================================================================
+# RÈGLES MÉTIER - Réponses directes
+# ============================================================================
+
+- rule: Répondre demande services
+  steps:
+    - intent: ask_services
+    - action: utter_services
+
+- rule: Répondre demande contact
+  steps:
+    - intent: ask_contact
+    - action: utter_contact
+
+- rule: Répondre demande tarifs
+  steps:
+    - intent: ask_pricing
+    - action: utter_pricing
+
+- rule: Répondre demande support
+  steps:
+    - intent: ask_support
+    - action: utter_support
+
+- rule: Répondre demande horaires
+  steps:
+    - intent: ask_hours
+    - action: utter_hours
+
+- rule: Répondre demande localisation
+  steps:
+    - intent: ask_location
+    - action: utter_location
+
+- rule: Répondre demande agent humain
+  steps:
+    - intent: ask_human_agent
+    - action: utter_ask_human
+
+# ============================================================================
+# RÈGLES RAG - Routing vers LLM
+# ============================================================================
+
+- rule: Router les questions hors scope vers RAG
+  steps:
+    - intent: out_of_scope
+    - action: action_router
+    - action: action_rag_query
+
+- rule: Router demande documentation vers RAG
+  steps:
+    - intent: ask_documentation
+    - action: action_rag_query
+
+- rule: Router demande info produit vers RAG
+  steps:
+    - intent: ask_product_info
+    - action: action_rag_query
+
+- rule: Router FAQ vers RAG si besoin
+  steps:
+    - intent: ask_faq
+    - action: action_router
+
+# ============================================================================
+# RÈGLES FALLBACK
+# ============================================================================
+
+- rule: Fallback NLU - Router vers RAG
+  steps:
+    - intent: nlu_fallback
+    - action: action_router
+    - action: action_rag_query
+
+- rule: Fallback par défaut
+  steps:
+    - intent: nlu_fallback
+    - action: action_default_fallback
+  condition:
+    - active_loop: null
+  wait_for_user_input: false
+
+# ============================================================================
+# RÈGLES FORMULAIRES - CONTACT
+# ============================================================================
+
+- rule: Activer formulaire contact
+  steps:
+    - intent: request_callback
+    - action: utter_callback_confirm
+    - action: callback_form
+    - active_loop: callback_form
+
+- rule: Soumettre formulaire contact
+  condition:
+    - active_loop: callback_form
+  steps:
+    - action: callback_form
+    - active_loop: null
+    - slot_was_set:
+        - requested_slot: null
+    - action: action_request_callback
+
+# ============================================================================
+# RÈGLES FORMULAIRES - RÉCLAMATION
+# ============================================================================
+
+- rule: Activer formulaire réclamation
+  steps:
+    - intent: make_complaint
+    - action: complaint_form
+    - active_loop: complaint_form
+
+- rule: Soumettre formulaire réclamation
+  condition:
+    - active_loop: complaint_form
+  steps:
+    - action: complaint_form
+    - active_loop: null
+    - slot_was_set:
+        - requested_slot: null
+    - action: action_create_ticket
+    - action: utter_complaint_received
+
+# ============================================================================
+# RÈGLES DE GESTION DES INTERRUPTIONS
+# ============================================================================
+
+- rule: Utilisateur demande arrêt pendant formulaire
+  condition:
+    - active_loop: callback_form
+  steps:
+    - intent: goodbye
+    - action: action_deactivate_loop
+    - active_loop: null
+    - action: utter_goodbye
+
+- rule: Utilisateur demande arrêt pendant réclamation
+  condition:
+    - active_loop: complaint_form
+  steps:
+    - intent: goodbye
+    - action: action_deactivate_loop
+    - active_loop: null
+    - action: utter_goodbye
+
+- rule: Utilisateur veut agent humain pendant formulaire
+  condition:
+    - active_loop: callback_form
+  steps:
+    - intent: ask_human_agent
+    - action: action_deactivate_loop
+    - active_loop: null
+    - action: utter_ask_human
+
+# ============================================================================
+# RÈGLES SESSION
+# ============================================================================
+
+- rule: Démarrage de session
+  conversation_start: true
+  steps:
+    - action: action_session_start
+
+# ============================================================================
+# RÈGLES LOGGING
+# ============================================================================
+
+- rule: Logger fin de conversation
+  steps:
+    - intent: goodbye
+    - action: action_log_conversation
+    - action: utter_goodbye

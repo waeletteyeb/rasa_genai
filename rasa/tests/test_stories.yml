@@ -1,0 +1,184 @@
+# ============================================================================
+# RASA TEST STORIES - Tests de conversation
+# ============================================================================
+
+version: "3.1"
+
+stories:
+
+# ============================================================================
+# TESTS BASIQUES
+# ============================================================================
+
+- story: test salutation
+  steps:
+    - user: |
+        bonjour
+      intent: greet
+    - action: utter_greet
+
+- story: test au revoir
+  steps:
+    - user: |
+        au revoir
+      intent: goodbye
+    - action: utter_goodbye
+
+- story: test bot challenge
+  steps:
+    - user: |
+        tu es un robot ?
+      intent: bot_challenge
+    - action: utter_iamabot
+
+- story: test remerciements
+  steps:
+    - user: |
+        merci beaucoup
+      intent: thank
+    - action: utter_thank
+
+# ============================================================================
+# TESTS INTENTS MÉTIER
+# ============================================================================
+
+- story: test demande services
+  steps:
+    - user: |
+        quels sont vos services ?
+      intent: ask_services
+    - action: utter_services
+
+- story: test demande contact
+  steps:
+    - user: |
+        comment vous contacter ?
+      intent: ask_contact
+    - action: utter_contact
+
+- story: test demande tarifs
+  steps:
+    - user: |
+        quels sont vos tarifs ?
+      intent: ask_pricing
+    - action: utter_pricing
+
+- story: test demande support
+  steps:
+    - user: |
+        j'ai besoin d'aide technique
+      intent: ask_support
+    - action: utter_support
+
+- story: test demande horaires
+  steps:
+    - user: |
+        quels sont vos horaires ?
+      intent: ask_hours
+    - action: utter_hours
+
+- story: test demande localisation
+  steps:
+    - user: |
+        où êtes-vous situés ?
+      intent: ask_location
+    - action: utter_location
+
+# ============================================================================
+# TESTS FALLBACK RAG
+# ============================================================================
+
+- story: test question hors scope
+  steps:
+    - user: |
+        quel temps fait-il ?
+      intent: out_of_scope
+    - action: action_router
+    - action: action_rag_query
+
+- story: test demande documentation
+  steps:
+    - user: |
+        avez-vous de la documentation ?
+      intent: ask_documentation
+    - action: action_rag_query
+
+# ============================================================================
+# TESTS AGENT HUMAIN
+# ============================================================================
+
+- story: test demande agent humain
+  steps:
+    - user: |
+        je veux parler à un humain
+      intent: ask_human_agent
+    - action: utter_ask_human
+
+# ============================================================================
+# TESTS PARCOURS COMPLETS
+# ============================================================================
+
+- story: test parcours découverte
+  steps:
+    - user: |
+        bonjour
+      intent: greet
+    - action: utter_greet
+    - user: |
+        quels services proposez-vous ?
+      intent: ask_services
+    - action: utter_services
+    - user: |
+        merci
+      intent: thank
+    - action: utter_thank
+    - user: |
+        au revoir
+      intent: goodbye
+    - action: utter_goodbye
+
+- story: test parcours support
+  steps:
+    - user: |
+        j'ai un problème technique
+      intent: ask_support
+    - action: utter_support
+    - user: |
+        comment vous contacter ?
+      intent: ask_contact
+    - action: utter_contact
+
+# ============================================================================
+# TESTS HUMEUR
+# ============================================================================
+
+- story: test bonne humeur
+  steps:
+    - user: |
+        super ça va très bien
+      intent: mood_great
+    - action: utter_happy
+
+- story: test mauvaise humeur
+  steps:
+    - user: |
+        je suis déçu
+      intent: mood_unhappy
+    - action: utter_cheer_up
+    - action: utter_did_that_help
+
+# ============================================================================
+# TESTS CONFIRMATION/NÉGATION
+# ============================================================================
+
+- story: test confirmation
+  steps:
+    - user: |
+        oui c'est ça
+      intent: affirm
+
+- story: test négation
+  steps:
+    - user: |
+        non pas du tout
+      intent: deny

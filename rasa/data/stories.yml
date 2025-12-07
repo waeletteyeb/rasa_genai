@@ -1,0 +1,339 @@
+# ============================================================================
+# RASA STORIES - Chemins conversationnels d'entraînement
+# ============================================================================
+
+version: "3.1"
+
+stories:
+
+# ============================================================================
+# STORIES DE BASE
+# ============================================================================
+
+- story: salutation simple
+  steps:
+    - intent: greet
+    - action: utter_greet
+
+- story: au revoir simple
+  steps:
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: salutation et au revoir
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: bot challenge
+  steps:
+    - intent: bot_challenge
+    - action: utter_iamabot
+
+- story: remerciements
+  steps:
+    - intent: thank
+    - action: utter_thank
+
+- story: utilisateur content
+  steps:
+    - intent: mood_great
+    - action: utter_happy
+
+- story: utilisateur mécontent puis réconfort
+  steps:
+    - intent: mood_unhappy
+    - action: utter_cheer_up
+    - action: utter_did_that_help
+
+# ============================================================================
+# STORIES MÉTIER - SERVICES
+# ============================================================================
+
+- story: demande de services
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_services
+    - action: utter_services
+    - intent: thank
+    - action: utter_thank
+
+- story: services puis contact
+  steps:
+    - intent: ask_services
+    - action: utter_services
+    - intent: ask_contact
+    - action: utter_contact
+
+- story: services puis tarifs
+  steps:
+    - intent: ask_services
+    - action: utter_services
+    - intent: ask_pricing
+    - action: utter_pricing
+
+# ============================================================================
+# STORIES MÉTIER - CONTACT
+# ============================================================================
+
+- story: demande de contact simple
+  steps:
+    - intent: ask_contact
+    - action: utter_contact
+
+- story: contact puis rappel
+  steps:
+    - intent: ask_contact
+    - action: utter_contact
+    - intent: request_callback
+    - action: utter_callback_confirm
+    - action: callback_form
+    - active_loop: callback_form
+
+- story: formulaire callback complété
+  steps:
+    - intent: request_callback
+    - action: utter_callback_confirm
+    - action: callback_form
+    - active_loop: callback_form
+    - active_loop: null
+    - action: action_request_callback
+    - action: utter_thank
+
+# ============================================================================
+# STORIES MÉTIER - SUPPORT
+# ============================================================================
+
+- story: demande support technique
+  steps:
+    - intent: ask_support
+    - action: utter_support
+    
+- story: support avec ticket existant
+  steps:
+    - intent: ask_support
+    - action: utter_support
+    - intent: affirm
+    - action: action_get_ticket_status
+
+- story: support sans ticket
+  steps:
+    - intent: ask_support
+    - action: utter_support
+    - intent: deny
+    - action: action_create_ticket
+
+# ============================================================================
+# STORIES MÉTIER - RÉCLAMATION
+# ============================================================================
+
+- story: réclamation client
+  steps:
+    - intent: make_complaint
+    - action: complaint_form
+    - active_loop: complaint_form
+    - active_loop: null
+    - action: action_create_ticket
+    - action: utter_complaint_received
+
+- story: réclamation avec colère puis aide
+  steps:
+    - intent: mood_unhappy
+    - action: utter_cheer_up
+    - intent: make_complaint
+    - action: complaint_form
+    - active_loop: complaint_form
+
+# ============================================================================
+# STORIES MÉTIER - INFORMATIONS
+# ============================================================================
+
+- story: demande horaires
+  steps:
+    - intent: ask_hours
+    - action: utter_hours
+
+- story: demande localisation
+  steps:
+    - intent: ask_location
+    - action: utter_location
+
+- story: demande tarifs
+  steps:
+    - intent: ask_pricing
+    - action: utter_pricing
+
+- story: horaires puis localisation
+  steps:
+    - intent: ask_hours
+    - action: utter_hours
+    - intent: ask_location
+    - action: utter_location
+
+# ============================================================================
+# STORIES - AGENT HUMAIN
+# ============================================================================
+
+- story: demande agent humain
+  steps:
+    - intent: ask_human_agent
+    - action: utter_ask_human
+
+- story: frustration puis agent humain
+  steps:
+    - intent: mood_unhappy
+    - action: utter_cheer_up
+    - intent: ask_human_agent
+    - action: utter_ask_human
+
+- story: bot pas utile puis agent humain
+  steps:
+    - intent: deny
+    - action: utter_ask_rephrase
+    - intent: ask_human_agent
+    - action: utter_ask_human
+
+# ============================================================================
+# STORIES - ROUTING RAG (Low Confidence)
+# ============================================================================
+
+- story: question hors scope vers RAG
+  steps:
+    - intent: out_of_scope
+    - action: action_router
+    - action: action_rag_query
+
+- story: fallback NLU vers RAG
+  steps:
+    - intent: nlu_fallback
+    - action: action_router
+    - action: action_rag_query
+
+- story: RAG puis satisfaction
+  steps:
+    - intent: out_of_scope
+    - action: action_router
+    - action: action_rag_query
+    - intent: affirm
+    - action: utter_happy
+
+- story: RAG puis insatisfaction
+  steps:
+    - intent: out_of_scope
+    - action: action_router
+    - action: action_rag_query
+    - intent: deny
+    - action: utter_ask_human
+
+# ============================================================================
+# STORIES - DOCUMENTATION
+# ============================================================================
+
+- story: demande documentation
+  steps:
+    - intent: ask_documentation
+    - action: action_rag_query
+
+- story: documentation puis question produit
+  steps:
+    - intent: ask_documentation
+    - action: action_rag_query
+    - intent: ask_product_info
+    - action: action_rag_query
+
+# ============================================================================
+# STORIES - FAQ GÉNÉRALE
+# ============================================================================
+
+- story: question FAQ générale
+  steps:
+    - intent: ask_faq
+    - action: action_router
+
+- story: FAQ puis satisfaction
+  steps:
+    - intent: ask_faq
+    - action: action_router
+    - intent: thank
+    - action: utter_thank
+    - intent: goodbye
+    - action: utter_goodbye
+
+# ============================================================================
+# STORIES COMPLEXES - PARCOURS COMPLETS
+# ============================================================================
+
+- story: parcours découverte complet
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_services
+    - action: utter_services
+    - intent: ask_pricing
+    - action: utter_pricing
+    - intent: ask_contact
+    - action: utter_contact
+    - intent: thank
+    - action: utter_thank
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: parcours support complet
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_support
+    - action: utter_support
+    - intent: deny
+    - action: action_create_ticket
+    - intent: thank
+    - action: utter_thank
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: parcours réclamation vers résolution
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: mood_unhappy
+    - action: utter_cheer_up
+    - intent: make_complaint
+    - action: complaint_form
+    - active_loop: complaint_form
+    - active_loop: null
+    - action: action_create_ticket
+    - action: utter_complaint_received
+    - intent: thank
+    - action: utter_thank
+
+# ============================================================================
+# STORIES - CONVERSATION MULTI-TOURS
+# ============================================================================
+
+- story: conversation exploratoire
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_faq
+    - action: action_router
+    - intent: ask_services
+    - action: utter_services
+    - intent: ask_product_info
+    - action: action_rag_query
+    - intent: affirm
+    - action: utter_happy
+
+- story: hésitation puis décision
+  steps:
+    - intent: ask_pricing
+    - action: utter_pricing
+    - intent: out_of_scope
+    - action: action_router
+    - action: action_rag_query
+    - intent: request_callback
+    - action: utter_callback_confirm
+    - action: callback_form
+    - active_loop: callback_form

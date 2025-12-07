@@ -1,0 +1,82 @@
+# ============================================================================
+# RASA ENDPOINTS - Configuration des services externes
+# ============================================================================
+
+# ============================================================================
+# ACTION SERVER
+# Serveur Python pour les actions custom (LLM + RAG)
+# ============================================================================
+action_endpoint:
+  url: "http://action-server:5055/webhook"
+  # Pour le développement local :
+  # url: "http://localhost:5055/webhook"
+
+# ============================================================================
+# TRACKER STORE
+# Stockage des conversations dans MongoDB
+# ============================================================================
+tracker_store:
+  type: mongod
+  url: "mongodb://mongodb:27017"
+  # Pour le développement local :
+  # url: "mongodb://localhost:27017"
+  db: "rasa_tracker"
+  username: ""
+  password: ""
+  auth_source: "admin"
+
+# ============================================================================
+# EVENT BROKER
+# Pour la publication d'événements temps réel (optionnel)
+# ============================================================================
+# event_broker:
+#   type: pika
+#   url: "amqp://guest:guest@rabbitmq:5672"
+#   queues:
+#     - rasa_events
+
+# Alternative : Redis
+# event_broker:
+#   type: redis
+#   url: "redis://redis:6379"
+#   db: 0
+
+# Alternative : Kafka
+# event_broker:
+#   type: kafka
+#   url: "kafka:9092"
+#   topic: "rasa_events"
+
+# ============================================================================
+# LOCK STORE
+# Pour le verrouillage des conversations (multi-instance)
+# ============================================================================
+lock_store:
+  type: redis
+  url: "redis://redis:6379"
+  # Pour le développement local sans Redis :
+  # type: in_memory
+  port: 6379
+  db: 1
+  password: ""
+  key_prefix: "rasa_lock:"
+
+# Pour le développement local sans Redis (décommenter) :
+# lock_store:
+#   type: in_memory
+
+# ============================================================================
+# NLG SERVER (optionnel)
+# Serveur externe pour la génération de réponses
+# ============================================================================
+# nlg:
+#   type: "callback"
+#   url: "http://nlg-server:5056/nlg"
+
+# ============================================================================
+# MODEL SERVER (optionnel)
+# Pour charger les modèles depuis un serveur distant
+# ============================================================================
+# models:
+#   url: "http://model-server:5057/models"
+#   wait_time_between_pulls: 10

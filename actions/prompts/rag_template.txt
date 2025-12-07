@@ -1,0 +1,14 @@
+CONTEXTE DOCUMENTAIRE :
+---
+{context}
+---
+
+QUESTION DE L'UTILISATEUR :
+{query}
+
+INSTRUCTIONS :
+1. Analyse le contexte fourni ci-dessus
+2. Réponds à la question en utilisant UNIQUEMENT les informations du contexte
+3. Si la réponse n'est pas dans le contexte, dis-le clairement
+4. Cite les sources pertinentes si disponibles
+5. Structure ta réponse de manière claire et lisible

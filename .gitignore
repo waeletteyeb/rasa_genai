@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+*.local
+
+# Logs
+logs/
+*.log
+
+# Data
+chroma_db/
+uploads/
+*.tar.gz
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rasa
+.rasa/
+models/
+
+# Docker
+.docker/
+
+# Coverage
+coverage/
+.coverage
+htmlcov/

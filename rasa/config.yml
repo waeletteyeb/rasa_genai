@@ -1,0 +1,177 @@
+# ============================================================================
+# RASA NLU + CORE CONFIGURATION
+# Chatbot Hybride Sofrecom - Pipeline optimisé pour le français
+# ============================================================================
+
+# Configuration de la langue
+language: fr
+
+# ============================================================================
+# PIPELINE NLU
+# Pipeline performant combinant SpaCy et Transformers
+# ============================================================================
+pipeline:
+  # ----------------------------------------------------------------------------
+  # Tokenization et Featurization
+  # ----------------------------------------------------------------------------
+  
+  # SpaCy pour le français - tokenization et entités pré-entraînées
+  - name: SpacyNLP
+    model: fr_core_news_md  # Modèle français moyen (plus précis que sm)
+    
+  - name: SpacyTokenizer
+    intent_tokenization_flag: false
+    intent_split_symbol: "_"
+    token_pattern: null
+    
+  # Extraction de features à partir de SpaCy
+  - name: SpacyFeaturizer
+    pooling: mean
+    
+  # Regex pour patterns spécifiques (numéros, emails, etc.)
+  - name: RegexFeaturizer
+    case_sensitive: false
+    use_word_boundaries: true
+    
+  # Lookup tables pour entités connues
+  - name: LexicalSyntacticFeaturizer
+  
+  # Count Vectors pour bag-of-words
+  - name: CountVectorsFeaturizer
+    analyzer: word
+    min_ngram: 1
+    max_ngram: 2
+    
+  # Count Vectors sur caractères (robuste aux fautes d'orthographe)
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    min_ngram: 1
+    max_ngram: 4
+    
+  # ----------------------------------------------------------------------------
+  # Classification et Extraction d'Entités
+  # ----------------------------------------------------------------------------
+  
+  # DIET Classifier - Classification d'intents + Extraction d'entités
+  - name: DIETClassifier
+    epochs: 150
+    constrain_similarities: true
+    model_confidence: cosine  # Meilleure calibration des scores
+    random_seed: 42
+    ranking_length: 5
+    batch_size:
+      - 64
+      - 256
+    batch_strategy: balanced
+    embedding_dimension: 20
+    hidden_layers_sizes:
+      text: [256, 128]
+      label: [256, 128]
+    connection_density: 0.2
+    dense_dimension:
+      text: 128
+      label: 20
+    concat_dimension:
+      text: 128
+      label: 20
+    number_of_transformer_layers: 2
+    number_of_attention_heads: 4
+    transformer_size: 256
+    drop_rate: 0.2
+    drop_rate_attention: 0.2
+    weight_sparsity: 0.8
+    use_sparse_input_dropout: true
+    entity_recognition: true
+    tensorboard_log_directory: ./tensorboard_logs
+    tensorboard_log_level: epoch
+    evaluate_every_number_of_epochs: 10
+    evaluate_on_number_of_examples: 0
+    
+  # Extraction d'entités via SpaCy (personnes, lieux, organisations)
+  - name: SpacyEntityExtractor
+    dimensions:
+      - PERSON
+      - LOC
+      - ORG
+      - MISC
+      
+  # Extraction d'entités regex (patterns personnalisés)
+  - name: RegexEntityExtractor
+    case_sensitive: false
+    use_lookup_tables: true
+    use_regexes: true
+    use_word_boundaries: true
+    
+  # Synonymes pour normalisation des entités
+  - name: EntitySynonymMapper
+
+  # ----------------------------------------------------------------------------
+  # Sélection de Réponse (pour retrieval intents)
+  # ----------------------------------------------------------------------------
+  
+  - name: ResponseSelector
+    epochs: 100
+    constrain_similarities: true
+
+  # ----------------------------------------------------------------------------
+  # Fallback Classifier
+  # Gère les messages avec faible confiance
+  # ----------------------------------------------------------------------------
+  
+  - name: FallbackClassifier
+    threshold: 0.75  # Seuil configuré par l'utilisateur
+    ambiguity_threshold: 0.1
+
+# ============================================================================
+# POLICIES (Dialogue Management)
+# ============================================================================
+policies:
+  # Mémorise les conversations exactes vues en entraînement
+  - name: MemoizationPolicy
+    max_history: 5
+    
+  # Policy basée sur les règles (prioritaire)
+  - name: RulePolicy
+    core_fallback_threshold: 0.3
+    core_fallback_action_name: action_default_fallback
+    enable_fallback_prediction: true
+    restrict_rules: true
+    check_for_contradictions: true
+    
+  # TED Policy - Apprentissage des patterns de dialogue
+  - name: TEDPolicy
+    max_history: 10
+    epochs: 200
+    constrain_similarities: true
+    model_confidence: cosine
+    random_seed: 42
+    batch_size:
+      - 64
+      - 256
+    batch_strategy: balanced
+    embedding_dimension: 20
+    hidden_layers_sizes:
+      text: [256, 128]
+      action_text: [256, 128]
+    transformer_size: 128
+    number_of_transformer_layers: 1
+    number_of_attention_heads: 4
+    connection_density: 0.2
+    drop_rate: 0.1
+    drop_rate_attention: 0.1
+    weight_sparsity: 0.8
+    split_entities_by_comma: true
+    evaluate_every_number_of_epochs: 10
+    evaluate_on_number_of_examples: 0
+    tensorboard_log_directory: ./tensorboard_logs
+    tensorboard_log_level: epoch
+    
+  # Unexpected Intent Policy - Gère les intents inattendus
+  - name: UnexpecTEDIntentPolicy
+    max_history: 8
+    epochs: 100
+
+# ============================================================================
+# ASSISTANT ID (pour multi-assistant)
+# ============================================================================
+assistant_id: sofrecom_chatbot_v1
